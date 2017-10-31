@@ -11,4 +11,7 @@ import java.util.List;
  */
 public interface ShoppingBasket {
 	public List<StockItem> getItems();
+	public void addItemToBasket(StockItem item);
+	
+	// + remove, modify etc
 }

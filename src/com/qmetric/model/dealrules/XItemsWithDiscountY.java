@@ -12,7 +12,7 @@ import com.qmetric.model.pricingmodels.Currency;
  * @author Richard Livingstone
  *
  */
-public class XForPriceOfY implements DealRules {
+public class XItemsWithDiscountY implements DealRules {
 	public Collection<StockItem> getRelatedItems() {
 		return null; 
 	};
@@ -24,7 +24,6 @@ public class XForPriceOfY implements DealRules {
 	public int getBaseCost(Currency requiredCurrency) {
 		return 0;
 	}
-
 	@Override
 	public int compareTo(Object o) {
 		return 0; // we don't care about the order of application in a larger set for now

@@ -24,4 +24,8 @@ public class BuyXGetYFree implements DealRules {
 	public int getBaseCost(Currency requiredCurrency) {
 		return 0;
 	}
+	@Override
+	public int compareTo(Object o) {
+		return 0; // we don't care about the order of application in a larger set for now
+	}
 }

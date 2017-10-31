@@ -12,8 +12,9 @@ import com.qmetric.model.pricingmodels.Currency;
  * @author Richard Livingstone
  *
  */
-public interface DealRules {
+public interface DealRules extends Comparable {
 	public Collection<StockItem> getRelatedItems();
 	public int getTotalDealSaving(Currency requiredCurrency); // although for now we will stick with one
 	public int getBaseCost(Currency requiredCurrency); // although for now we will stick with one
+	public String getReceiptLine();
 }

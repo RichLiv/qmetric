@@ -1,0 +1,47 @@
+Apologies but this file keeps vanishing from Git when I check my code in so I have once again recreated it in my Eclipse project
+
+Salient design assumptions and structure:
+
+Stock items - oranges, cans of coke. Assume they will have attributes that describe things like
+- Cost (including unit of supply)
+- Simple price (including units of checkout)
+
+Supplier
+- name
+- address
+(could be external or other branch of supermarket)
+
+Cost - cost per unit of supply in specific currency at a specific datetime from a specific supplier in a specific unit
+
+Simple price - cost per unit of checkout in specific currency from datetime to (optional) end datetime
+
+Linked items - composition of several stock items, recursively - will have LinkedDealRules to drive pricing
+
+LinkedDealRules - ordered collection of DealRules denoting in which order deals are to be applied (presumably, best for the customer first but a
+supermarket might in fact want to bump up some deals to get rid of stock - called "searchandising" when applied to websites. Legit as 
+customers might then get to have this suggested to them as they go round the store)
+
+DealRules - e.g. BNGNF, XForPriceOfY. Need to be able to identify when this is applied to a basket and to return 
+set of applicable savings for a receipt. 
+
+Fractional money and rounding rules - I will assume for simplicity that this is out of scope and that deals that say 3 for £1 are not splittable into one for 33.3333p
+
+Currency conversion tables - I will assume for simplicity that we are operating in a single currency though in the real world this might not be the case for a big supermarket
+
+Audit trails - supported will be
+ - accounting ledger posts
+ - till logs (receipts)
+ - sanitised developer logs
+ - error logs
+
+Basket - the shopping basket to which the above set of rules will be applied
+
+Should be able to achieve the following
+
+- cost a basket and show optimum (or at least, approved order of) savings
+- further, value an arbitrary set of goods based on both checkout price and supplied price
+- thus, work out the profit applicable to that arbitrary set of goods 
+- structure the design so that it is possible to work out if the same basket could be obtained cheaper from a different combination of 
+suppliers (maximised profit) but not necessarily to do this in first pass
+- keep simple audit trail
+

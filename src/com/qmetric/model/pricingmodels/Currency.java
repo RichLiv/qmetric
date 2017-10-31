@@ -35,4 +35,5 @@ public interface Currency {
 	public String getCurrencySymbol();
 	public int getIso4217NumericCode();
 	public String getIso4217AlpabeticCode();
+
 }
