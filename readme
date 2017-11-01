@@ -24,7 +24,7 @@ customers might then get to have this suggested to them as they go round the sto
 DealRules - e.g. BNGNF, XForPriceOfY. Need to be able to identify when this is applied to a basket and to return 
 set of applicable savings for a receipt. 
 
-Fractional money and rounding rules - I will assume for simplicity that this is out of scope and that deals that say 3 for £1 are not splittable into one for 33.3333p
+Fractional money and rounding rules - this will have to be addressed as intrinsic part of problem domain
 
 Currency conversion tables - I will assume for simplicity that we are operating in a single currency though in the real world this might not be the case for a big supermarket
 
@@ -33,8 +33,8 @@ Audit trails - supported will be
  - till logs (receipts)
  - sanitised developer logs
  - error logs
-
-Basket - the shopping basket to which the above set of rules will be applied
+ 
+ Basket - the shopping basket to which the above set of rules will be applied
 
 Should be able to achieve the following
 
@@ -44,4 +44,6 @@ Should be able to achieve the following
 - structure the design so that it is possible to work out if the same basket could be obtained cheaper from a different combination of 
 suppliers (maximised profit) but not necessarily to do this in first pass
 - keep simple audit trail
+
+Still to do - more logging, unit test for profit on baskets maybe,  could implement deal rules properly (although the structure of the problem is addressed well enough so perhaps no need) 
 

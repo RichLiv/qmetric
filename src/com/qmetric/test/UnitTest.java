@@ -3,10 +3,8 @@ package com.qmetric.test;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -19,6 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.qmetric.actors.Supplier;
+import com.qmetric.audit.AuditLogger;
+import com.qmetric.audit.TillAuditLogger;
+import com.qmetric.exception.AuditFailureException;
 import com.qmetric.goods.InStoreShoppingBasket;
 import com.qmetric.goods.ShoppingBasket;
 import com.qmetric.goods.StockItem;
@@ -31,7 +32,6 @@ import com.qmetric.model.dealrules.XItemsWithDiscountY;
 import com.qmetric.model.pricingmodels.CostPricingModel;
 import com.qmetric.model.pricingmodels.Currency;
 import com.qmetric.model.pricingmodels.SimplePricingModel;
-import com.sun.xml.internal.ws.message.MimeAttachmentSet;
 
 public class UnitTest {
 
@@ -190,6 +190,11 @@ public class UnitTest {
 			public BigDecimal getQuantity() {
 				return BigDecimal.valueOf(0.2F);
 			}
+			
+			public String toString() {
+				// for logging. Could add units etc etc if we wanted
+				return new StringBuffer(getReceiptLine()).append(", price in cents is ").append(getPriceAtTill().getPriceInCents().intValue()).toString();
+			}
 		};
 
 		this.coke = new StockItem() {
@@ -214,6 +219,7 @@ public class UnitTest {
 					public Supplier getSupplier() {
 						return UnitTest.this.tinnedGoodsSupplier;
 					}
+
 				};
 			}
 			@Override
@@ -256,6 +262,10 @@ public class UnitTest {
 			@Override
 			public BigDecimal getQuantity() {
 				return BigDecimal.ONE;
+			}
+			public String toString() {
+				// for logging. Could add units etc etc if we wanted
+				return new StringBuffer(getReceiptLine()).append(", price in cents is ").append(getPriceAtTill().getPriceInCents().intValue()).toString();
 			}
 		};
 
@@ -323,6 +333,10 @@ public class UnitTest {
 			@Override
 			public BigDecimal getQuantity() {
 				return BigDecimal.ONE;
+			}
+			public String toString() {
+				// for logging. Could add units etc etc if we wanted
+				return new StringBuffer(getReceiptLine()).append(", price in cents is ").append(getPriceAtTill().getPriceInCents().intValue()).toString();
 			}
 		};
 		
@@ -473,6 +487,15 @@ public class UnitTest {
 				});
 
 		System.out.println(totalToPayReceiptLine);
+
+		System.out.println("Audit log entry will be something like this (though printed to a persistent audit stream somewhere not to stdout):");
+
+		AuditLogger logger = new TillAuditLogger();
+		try {
+			logger.logSale(myBasket);
+		} catch (AuditFailureException e) {
+			e.printStackTrace();
+		}
 
 		assertTrue(true); // we are not especially testing values as we go along here as the exercise is 
 		// fairly simple but we could do.

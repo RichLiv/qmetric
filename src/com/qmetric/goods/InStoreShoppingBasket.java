@@ -3,7 +3,9 @@
  */
 package com.qmetric.goods;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.qmetric.model.pricingmodels.Currency;
@@ -22,4 +24,12 @@ public class InStoreShoppingBasket implements ShoppingBasket {
 	public Currency getCurrency() {
 		return Currency.GBP; // simplicity
 	};
+	
+	public String toString() {
+		StringBuffer ret = new StringBuffer("Shopping basket on ").append(new SimpleDateFormat("dd MM yyyy hh:mm").format(Calendar.getInstance().getTime())).append("\n");
+		for (StockItem nextOne : getItems()) {
+			ret.append(nextOne.toString()).append("\n");
+		}
+		return ret.toString();
+	}
 }
