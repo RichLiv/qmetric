@@ -47,8 +47,7 @@ suppliers (maximised profit) but not necessarily to do this in first pass
 
 Still to do 
 - refactoring to remove some duplication of concretions in test harness though not so important as in unit test not core code
-- more logging, maybe
-- unit test for profit on baskets maybe
+- add actual tests to compare with expected results as currently it just produces test output
 - could implement deal rules properly (although the structure of the problem is addressed well enough so perhaps no need)
  - not used actors so either use or remove. Probably remove as they would only used be for testing so are not really part of the problem solution here 
 
