@@ -45,5 +45,10 @@ Should be able to achieve the following
 suppliers (maximised profit) but not necessarily to do this in first pass
 - keep simple audit trail
 
-Still to do - more logging, unit test for profit on baskets maybe,  could implement deal rules properly (although the structure of the problem is addressed well enough so perhaps no need) 
+Still to do 
+- refactoring to remove some duplication of concretions in test harness though not so important as in unit test not core code
+- more logging, maybe
+- unit test for profit on baskets maybe
+- could implement deal rules properly (although the structure of the problem is addressed well enough so perhaps no need)
+ 
 
