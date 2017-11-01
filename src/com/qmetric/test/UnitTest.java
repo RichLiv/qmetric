@@ -448,13 +448,20 @@ public class UnitTest {
 			subTotalInCents += incrementToSubTotal.floatValue(); 
 		}
 
-		assertTrue("Test subtotal", subTotalInCents == 330.0F);
+		// rounds up to whole number of cents 
+		BigDecimal subTotalForDisplayAndTest = UnitTest.formatAmountForDisplayWithDecimals(
+				BigDecimal.valueOf(subTotalInCents), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
+		BigDecimal testSubTotal = UnitTest.formatAmountForDisplayWithDecimals(
+				BigDecimal.valueOf(330L), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP); 
+		assertTrue("Test subtotal", subTotalForDisplayAndTest.equals(testSubTotal));
 		
 		System.out.println("-----------");
 
 		String subTotalReceiptLine = MessageFormat.format("Sub-total\t\t{0,number,####0.00}", 
 				new Object[] {
-					UnitTest.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(subTotalInCents), myBasket.getCurrency()) // could introduce a basket currency if we wanted
+					subTotalForDisplayAndTest
 				});
 
 		System.out.println(subTotalReceiptLine);
@@ -470,13 +477,20 @@ public class UnitTest {
 			System.out.println(nextRuleApplied.getReceiptLine());
 		}
 
-		assertTrue("Test savings", cumulativeSavings == 90.0F);
+		BigDecimal cumulativeSavingsForDisplayAndTest = UnitTest.formatAmountForDisplayWithDecimals(
+				BigDecimal.valueOf(cumulativeSavings), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
+		BigDecimal testCumulativeSavings = UnitTest.formatAmountForDisplayWithDecimals(
+				BigDecimal.valueOf(90L), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP); 
+		assertTrue("Test subtotal", cumulativeSavingsForDisplayAndTest.equals(testCumulativeSavings));
 
+		
 		System.out.println("\t\t\t------");
 
 		String totalSavingsReceiptLine = MessageFormat.format("Total savings\t\t-{0,number,####0.00}", 
 				new Object[] {
-					UnitTest.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(cumulativeSavings), myBasket.getCurrency()) // could introduce a basket currency if we wanted
+						cumulativeSavingsForDisplayAndTest
 				});
 
 		System.out.println(totalSavingsReceiptLine);
@@ -497,6 +511,7 @@ public class UnitTest {
 			logger.logSale(myBasket);
 		} catch (AuditFailureException e) {
 			e.printStackTrace();
+			assertTrue(e.getMessage(),false);
 		}
 
 		// if we wanted to make this more fully features, we would construct a whole raft of different deal rules and test each here in the same way
