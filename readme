@@ -50,5 +50,5 @@ Still to do
 - more logging, maybe
 - unit test for profit on baskets maybe
 - could implement deal rules properly (although the structure of the problem is addressed well enough so perhaps no need)
- 
+ - not used actors so either use or remove. Probably remove as they would only used be for testing so are not really part of the problem solution here 
 
