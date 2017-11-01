@@ -46,10 +46,9 @@ suppliers (maximised profit) but not necessarily to do this in first pass
 - keep simple audit trail
 
 Still to do 
-- refactoring to remove some duplication of concretions in test harness though not so important as in unit test not core code
-- add actual tests to compare with expected results as currently it just produces test output
-- could implement deal rules properly (although the structure of the problem is addressed well enough so perhaps no need)
- - not used actors so either use or remove. Probably remove as they would only used be for testing so are not really part of the problem solution here 
+- could implement deal rules properly (although the structure of the problem is addressed well enough so no need)
+- if we wanted to test the operation of customers, tills etc with retrieval of data from elswhere (other systems) we could use the various actor classes
+but for this exercise, not really required. I could remove them but I thought I might as well leave them to demonstrate the possibility   
 
 Current output of test is :
 

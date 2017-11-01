@@ -448,6 +448,8 @@ public class UnitTest {
 			subTotalInCents += incrementToSubTotal.floatValue(); 
 		}
 
+		assertTrue("Test subtotal", subTotalInCents == 330.0F);
+		
 		System.out.println("-----------");
 
 		String subTotalReceiptLine = MessageFormat.format("Sub-total\t\t{0,number,####0.00}", 
@@ -455,8 +457,6 @@ public class UnitTest {
 					UnitTest.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(subTotalInCents), myBasket.getCurrency()) // could introduce a basket currency if we wanted
 				});
 
-		
-		
 		System.out.println(subTotalReceiptLine);
 		System.out.println("");
 		System.out.println("Savings");
@@ -469,7 +469,9 @@ public class UnitTest {
 			cumulativeSavings += nextRuleApplied.getTotalDealSaving(myBasket.getCurrency()).floatValue();
 			System.out.println(nextRuleApplied.getReceiptLine());
 		}
-		
+
+		assertTrue("Test savings", cumulativeSavings == 90.0F);
+
 		System.out.println("\t\t\t------");
 
 		String totalSavingsReceiptLine = MessageFormat.format("Total savings\t\t-{0,number,####0.00}", 
@@ -497,9 +499,8 @@ public class UnitTest {
 			e.printStackTrace();
 		}
 
-		assertTrue(true); // we are not especially testing values as we go along here as the exercise is 
-		// fairly simple but we could do.
-		
+		// if we wanted to make this more fully features, we would construct a whole raft of different deal rules and test each here in the same way
+		// as that's not the point of the exercise, I'm not going down that route 
 	}
 	
 	private static BigDecimal formatAmountForDisplayWithDecimals(BigDecimal amount, Currency currency) {
