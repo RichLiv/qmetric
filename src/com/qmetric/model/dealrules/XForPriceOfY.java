@@ -3,6 +3,7 @@
  */
 package com.qmetric.model.dealrules;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import com.qmetric.goods.StockItem;
@@ -12,17 +13,17 @@ import com.qmetric.model.pricingmodels.Currency;
  * @author Richard Livingstone
  *
  */
-public class XForPriceOfY implements DealRules {
+public abstract class XForPriceOfY extends UniqueDealRules {
 	public Collection<StockItem> getRelatedItems() {
 		return null; 
 	};
 	
-	public int getTotalDealSaving(Currency requiredCurrency) {
-		return 0;
+	public BigDecimal getTotalDealSaving(Currency requiredCurrency) {
+		return BigDecimal.ZERO;
 	}
 	
-	public int getBaseCost(Currency requiredCurrency) {
-		return 0;
+	public BigDecimal getBaseCost(Currency requiredCurrency) {
+		return BigDecimal.ZERO;
 	}
 
 	@Override

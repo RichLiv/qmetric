@@ -3,6 +3,7 @@
  */
 package com.qmetric.model.dealrules;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import com.qmetric.goods.StockItem;
@@ -14,7 +15,7 @@ import com.qmetric.model.pricingmodels.Currency;
  */
 public interface DealRules extends Comparable {
 	public Collection<StockItem> getRelatedItems();
-	public int getTotalDealSaving(Currency requiredCurrency); // although for now we will stick with one
-	public int getBaseCost(Currency requiredCurrency); // although for now we will stick with one
+	public BigDecimal getTotalDealSaving(Currency requiredCurrency); // although for now we will stick with one
+	public BigDecimal getBaseCost(Currency requiredCurrency); // although for now we will stick with one
 	public String getReceiptLine();
 }

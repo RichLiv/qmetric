@@ -3,6 +3,7 @@ package com.qmetric.test;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -23,12 +24,14 @@ import com.qmetric.goods.ShoppingBasket;
 import com.qmetric.goods.StockItem;
 import com.qmetric.goods.StockUnitsOfMeasure;
 import com.qmetric.model.dealrules.DealPackage;
+import com.qmetric.model.dealrules.DealRules;
 import com.qmetric.model.dealrules.OrderlyDealPackage;
 import com.qmetric.model.dealrules.XForPriceOfY;
 import com.qmetric.model.dealrules.XItemsWithDiscountY;
 import com.qmetric.model.pricingmodels.CostPricingModel;
 import com.qmetric.model.pricingmodels.Currency;
 import com.qmetric.model.pricingmodels.SimplePricingModel;
+import com.sun.xml.internal.ws.message.MimeAttachmentSet;
 
 public class UnitTest {
 
@@ -131,8 +134,8 @@ public class UnitTest {
 					}
 
 					@Override
-					public int getPriceInCents() {
-						return 23; // I made this up ;-)
+					public BigDecimal getPriceInCents() {
+						return BigDecimal.valueOf(23); // I made this up ;-)
 					}
 					
 					public Supplier getSupplier() {
@@ -160,8 +163,8 @@ public class UnitTest {
 					}
 
 					@Override
-					public int getPriceInCents() {
-						return 199;
+					public BigDecimal getPriceInCents() {
+						return BigDecimal.valueOf(199D * getQuantity().doubleValue());
 					}
 
 					@Override
@@ -180,15 +183,12 @@ public class UnitTest {
 			}
 			@Override
 			public String getReceiptLine() {
-				// TODO change so it matches the receipt,not too difficult
-				BigDecimal amount = new BigDecimal(getPriceAtTill().getPriceInCents());
-				BigDecimal amountLocal = amount.setScale(getPriceAtTill().getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
-				amountLocal = amountLocal.scaleByPowerOfTen(-1*getPriceAtTill().getCurrency().getNumberOfDecimalPlaces());
-				String receiptLine = MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(), getPriceAtTill().getCurrency());
+				return MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
 			}
 			@Override
-			public Double getQuantity() {
-				return Double.valueOf(0.2F);
+			public BigDecimal getQuantity() {
+				return BigDecimal.valueOf(0.2F);
 			}
 		};
 
@@ -207,8 +207,8 @@ public class UnitTest {
 					}
 
 					@Override
-					public int getPriceInCents() {
-						return 13; // I made this up ;-)
+					public BigDecimal getPriceInCents() {
+						return BigDecimal.valueOf(13); // I made this up ;-)
 					}
 					
 					public Supplier getSupplier() {
@@ -230,8 +230,8 @@ public class UnitTest {
 					}
 
 					@Override
-					public int getPriceInCents() {
-						return 70;
+					public BigDecimal getPriceInCents() {
+						return BigDecimal.valueOf(70);
 					}
 
 					@Override
@@ -250,15 +250,12 @@ public class UnitTest {
 			}
 			@Override
 			public String getReceiptLine() {
-				// avoids rounding errors when formatting
-				BigDecimal amount = new BigDecimal(getPriceAtTill().getPriceInCents());
-				BigDecimal amountLocal = amount.setScale(getPriceAtTill().getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
-				amountLocal = amountLocal.scaleByPowerOfTen(-1*getPriceAtTill().getCurrency().getNumberOfDecimalPlaces());
-				String receiptLine = MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(), getPriceAtTill().getCurrency());
+				return MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
 			}
 			@Override
-			public Double getQuantity() {
-				return 1D;
+			public BigDecimal getQuantity() {
+				return BigDecimal.ONE;
 			}
 		};
 
@@ -277,8 +274,8 @@ public class UnitTest {
 					}
 
 					@Override
-					public int getPriceInCents() {
-						return 8; // I made this up ;-)
+					public BigDecimal getPriceInCents() {
+						return BigDecimal.valueOf(8); // I made this up ;-)
 					}
 					
 					public Supplier getSupplier() {
@@ -300,8 +297,8 @@ public class UnitTest {
 					}
 
 					@Override
-					public int getPriceInCents() {
-						return 50;
+					public BigDecimal getPriceInCents() {
+						return BigDecimal.valueOf(50);
 					}
 
 					@Override
@@ -320,15 +317,12 @@ public class UnitTest {
 			}
 			@Override
 			public String getReceiptLine() {
-				// avoids rounding errors when formatting
-				BigDecimal amount = new BigDecimal(getPriceAtTill().getPriceInCents());
-				BigDecimal amountLocal = amount.setScale(getPriceAtTill().getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
-				amountLocal = amountLocal.scaleByPowerOfTen(-1*getPriceAtTill().getCurrency().getNumberOfDecimalPlaces());
-				String receiptLine = MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(), getPriceAtTill().getCurrency());
+				return MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
 			}
 			@Override
-			public Double getQuantity() {
-				return 1D;
+			public BigDecimal getQuantity() {
+				return BigDecimal.ONE;
 			}
 		};
 		
@@ -374,12 +368,25 @@ public class UnitTest {
 						});
 			};
 			
-			public int getTotalDealSaving(Currency requiredCurrency) {
+			public BigDecimal getTotalDealSaving(Currency requiredCurrency) {
 				return UnitTest.this.bakedBeans.getPriceAtTill().getPriceInCents(); // convert - or we could use a CurrencyAmount class as an enhancement to encapsulate the currency a bit more if we were really calculating conversions 
 			}
 			
-			public int getBaseCost(Currency requiredCurrency) {
-				return UnitTest.this.bakedBeans.getCostOfSupply().getPriceInCents() * 3;
+			public BigDecimal getBaseCost(Currency requiredCurrency) {
+				return UnitTest.this.bakedBeans.getPriceAtTill().getPriceInCents().multiply(BigDecimal.valueOf(getRelatedItems().size()));
+			}
+
+			@Override
+			public String getReceiptLine() {
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getTotalDealSaving(UnitTest.this.bakedBeans.getPriceAtTill().getCurrency()), UnitTest.this.bakedBeans.getPriceAtTill().getCurrency());
+				String receiptLine = MessageFormat.format("{0} {1} for {2}\t\t-{3,number,####0.00}", 
+						new Object[] {
+								UnitTest.this.bakedBeans.getName(),
+								getRelatedItems().size(),
+								getRelatedItems().size()-1,
+								amountLocal
+						});
+				return receiptLine;
 			}
 		});
 		dealRules.addRules(new XItemsWithDiscountY() {
@@ -390,31 +397,92 @@ public class UnitTest {
 						});
 			};
 			
-			public int getTotalDealSaving(Currency requiredCurrency) {
-				return 40; // fixed discount in this case 
+			public BigDecimal getTotalDealSaving(Currency requiredCurrency) {
+				return BigDecimal.valueOf(40); // fixed discount in this case 
 			}
 			
-			public int getBaseCost(Currency requiredCurrency) {
-				return UnitTest.this.coke.getCostOfSupply().getPriceInCents() * 2;
+			public BigDecimal getBaseCost(Currency requiredCurrency) {
+				return UnitTest.this.coke.getPriceAtTill().getPriceInCents().multiply(BigDecimal.valueOf(getRelatedItems().size()));
 			}
+
+			@Override
+			public String getReceiptLine() {
+				// adjust decimal places for printing
+				BigDecimal actualAmountPaid = getBaseCost(UnitTest.this.coke.getPriceAtTill().getCurrency()).subtract(getTotalDealSaving(UnitTest.this.coke.getPriceAtTill().getCurrency()));
+				actualAmountPaid = UnitTest.formatAmountForDisplayWithDecimals(actualAmountPaid, UnitTest.this.coke.getPriceAtTill().getCurrency());
+				BigDecimal totalSaving = getTotalDealSaving(UnitTest.this.coke.getPriceAtTill().getCurrency());
+				totalSaving = UnitTest.formatAmountForDisplayWithDecimals(totalSaving, UnitTest.this.coke.getPriceAtTill().getCurrency());
+				String receiptLine = MessageFormat.format("{0} {1} for {2}{3}\t\t-{4,number,####0.00}", 
+						new Object[] {
+								UnitTest.this.coke.getName(),
+								getRelatedItems().size(),
+								UnitTest.this.coke.getPriceAtTill().getCurrency().getCurrencySymbol(),
+								actualAmountPaid,
+								totalSaving
+						});
+				
+				return receiptLine;
+			}
+			
 		});
 
-		double subTotalInCents = 0D;
-		List<String> savingsLines = new ArrayList<String>();
+		float subTotalInCents = 0.00F;
+		
 		for (StockItem nextItem : myBasket.getItems()) {
 			System.out.println(nextItem.getReceiptLine());
-			subTotalInCents += nextItem.getQuantity() * nextItem.getPriceAtTill().getPriceInCents(); 
+			BigDecimal incrementToSubTotal = nextItem.getPriceAtTill().getPriceInCents();
+			subTotalInCents += incrementToSubTotal.floatValue(); 
 		}
-		System.out.println("");
-		System.out.println("Sub-total");
+
+		System.out.println("-----------");
+
+		String subTotalReceiptLine = MessageFormat.format("Sub-total\t\t{0,number,####0.00}", 
+				new Object[] {
+					UnitTest.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(subTotalInCents), myBasket.getCurrency()) // could introduce a basket currency if we wanted
+				});
+
+		
+		
+		System.out.println(subTotalReceiptLine);
 		System.out.println("");
 		System.out.println("Savings");
-
-		// TODO Retrieve applicable savings etc and put on receipt
 		
+		// logic in here is not implemented but it is structured such that adding it is fairly trivial
+		List<DealRules> appliedRules = dealRules.getApplicableRules(myBasket);
+
+		float cumulativeSavings = 0.00F;
+		for (DealRules nextRuleApplied : appliedRules) {
+			cumulativeSavings += nextRuleApplied.getTotalDealSaving(myBasket.getCurrency()).floatValue();
+			System.out.println(nextRuleApplied.getReceiptLine());
+		}
+		
+		System.out.println("\t\t\t------");
+
+		String totalSavingsReceiptLine = MessageFormat.format("Total savings\t\t-{0,number,####0.00}", 
+				new Object[] {
+					UnitTest.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(cumulativeSavings), myBasket.getCurrency()) // could introduce a basket currency if we wanted
+				});
+
+		System.out.println(totalSavingsReceiptLine);
+		
+		System.out.println("-----------");
+
+		String totalToPayReceiptLine = MessageFormat.format("Total to pay\t\t{0,number,####0.00}", 
+				new Object[] {
+					UnitTest.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(subTotalInCents - cumulativeSavings), myBasket.getCurrency()) // could introduce a basket currency if we wanted
+				});
+
+		System.out.println(totalToPayReceiptLine);
+
 		assertTrue(true); // we are not especially testing values as we go along here as the exercise is 
 		// fairly simple but we could do.
 		
 	}
-
+	
+	private static BigDecimal formatAmountForDisplayWithDecimals(BigDecimal amount, Currency currency) {
+		// avoid rounding issues
+		BigDecimal amountLocal = amount.setScale(currency.getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
+		amountLocal = amountLocal.scaleByPowerOfTen(-1*currency.getNumberOfDecimalPlaces());
+		return amountLocal;
+	}
 }

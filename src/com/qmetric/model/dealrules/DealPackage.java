@@ -3,8 +3,11 @@
  */
 package com.qmetric.model.dealrules;
 
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import com.qmetric.goods.ShoppingBasket;
 
 /**
  * @author Richard Livingstone
@@ -12,5 +15,5 @@ import java.util.TreeSet;
  */
 public interface DealPackage {
 	public void addRules(DealRules deal);
-	public DealRules getApplicableRule();
+	public List<DealRules> getApplicableRules(ShoppingBasket b);
 }

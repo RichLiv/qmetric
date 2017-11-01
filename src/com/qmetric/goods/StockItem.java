@@ -3,6 +3,8 @@
  */
 package com.qmetric.goods;
 
+import java.math.BigDecimal;
+
 import com.qmetric.model.pricingmodels.CostPricingModel;
 import com.qmetric.model.pricingmodels.SimplePricingModel;
 
@@ -15,5 +17,5 @@ public interface StockItem { // to get order in receipt
 	public SimplePricingModel getPriceAtTill();
 	public String getName();
 	public String getReceiptLine();
-	public Double getQuantity(); // for many items, an integer, for weighedout items, could be a fraction
+	public BigDecimal getQuantity(); // not always an int so to be safe, use safe arithmetic classes 
 }

@@ -1,5 +1,6 @@
 package com.qmetric.model.pricingmodels;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 
 import com.qmetric.goods.StockUnitsOfMeasure;
@@ -9,7 +10,7 @@ public class SimplePricingModel implements PricingModel {
 
 	private StockUnitsOfMeasure units;
 	private Currency curr;
-	private int price;
+	private BigDecimal price;
 	private Calendar dateInForce;
 	private Calendar expiryDate;
 
@@ -24,7 +25,7 @@ public class SimplePricingModel implements PricingModel {
 	}
 
 	@Override
-	public int getPriceInCents() {
+	public BigDecimal getPriceInCents() {
 		return price;
 	}
 

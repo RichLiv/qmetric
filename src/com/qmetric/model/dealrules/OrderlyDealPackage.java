@@ -3,27 +3,32 @@
  */
 package com.qmetric.model.dealrules;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.qmetric.goods.ShoppingBasket;
 
 /**
  * @author Richard Livingstone
  *
  */
-public final class OrderlyDealPackage implements DealPackage {
-	// ordering is via equals() so we would make DealRules Comparable and implement in whatever way we chose
-	// for next bit
-	SortedSet<DealRules> rulesForDeal = new TreeSet<DealRules>();
+public class OrderlyDealPackage implements DealPackage {
+	// could order using TreeSet but more likely that explicit ordering will take place either due to basket contents 
+	// or from store staff
+	private List<DealRules> rulesForDeal = new ArrayList<DealRules>();
 
 	public void addRules(DealRules deal) {
 		this.rulesForDeal.add(deal);
 	}
 	
 	/*
-	 * To do - fix this so that it compares the value for money of each deal in the list and returns the best value
-	 * or whatever rule the store wants to implement (searchandising, in ecommerce terms, to push certain deals) 
+	 * Returns deals applied in order in which they were implemented
+	 * Currently, this is not actually implemented but it could be used to implement whatever precanned algorithm we  want 
 	 */
-	public DealRules getApplicableRule() {
-		return rulesForDeal.size() == 0 ? null : rulesForDeal.first();
+	public List<DealRules> getApplicableRules(ShoppingBasket b) {
+		List<DealRules> ret = new ArrayList<DealRules>();
+		ret.addAll(rulesForDeal); // TODO apply much more logic to this process 
+		return ret;
 	}
+
 }
