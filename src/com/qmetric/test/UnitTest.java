@@ -7,7 +7,6 @@ import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
@@ -452,8 +451,9 @@ public class UnitTest {
 						getTotalDealSaving(UnitTest.this.bakedBeans.getPriceAtTill().getCurrency(),1),
 						UnitTest.this.bakedBeans.getPriceAtTill().getCurrency());
 				String receiptLine = MessageFormat.format("{0} {1} for {2}\t\t-{3,number,####0.00}",
-						new Object[] { UnitTest.this.bakedBeans.getName(), getRelatedItems().size(),
-								getRelatedItems().size() - 1, amountLocal });
+						new Object[] { UnitTest.this.bakedBeans.getName(), 
+								getNumberOfItemsBought(),
+								getNumberOfItemsCharged(), amountLocal });
 				return receiptLine;
 			}
 		});
@@ -477,8 +477,11 @@ public class UnitTest {
 					totalSaving = UnitTest.formatAmountForDisplayWithDecimals(totalSaving,
 						UnitTest.this.coke.getPriceAtTill().getCurrency());
 					String receiptLine = MessageFormat.format("{0} {1} for {2}{3}\t\t-{4,number,####0.00}",
-						new Object[] { UnitTest.this.coke.getName(), getRelatedItems().size(),
-								UnitTest.this.coke.getPriceAtTill().getCurrency().getCurrencySymbol(), actualAmountPaid,
+						new Object[] { 
+								UnitTest.this.coke.getName(), 
+								getNumberOfItemsBought(),
+								UnitTest.this.coke.getPriceAtTill().getCurrency().getCurrencySymbol(), 
+								actualAmountPaid,
 								totalSaving });
 
 				return receiptLine;
@@ -487,23 +490,42 @@ public class UnitTest {
 		});
 
 		float subTotalInCents = 0.00F;
-
+		float runningCostOfBasketToStoreInCents = 0.00F; 
+		
 		for (StockItem nextItem : myBasket.getItems()) {
 			assertTrue(nextItem.getReceiptLine() != null && nextItem.getReceiptLine().length() > 0);
 			this.tracer.logTestOutput(nextItem.getReceiptLine());
 			assertTrue(nextItem.getPriceAtTill().getPriceInCents().floatValue() > 0.00F);
 			final BigDecimal incrementToSubTotal = nextItem.getPriceAtTill().getPriceInCents();
 			subTotalInCents += incrementToSubTotal.floatValue();
+			
+			runningCostOfBasketToStoreInCents += nextItem.getCostOfSupply().getPriceInCents().floatValue();
 		}
 
+		String runningCostOfBasketStr = MessageFormat.format("Supply cost of basket: {0,number,####0.00}",
+				new Object[] { 
+						UnitTest
+						.formatAmountForDisplayWithDecimals(
+								BigDecimal.valueOf(runningCostOfBasketToStoreInCents),
+								myBasket.getCurrency())
+						});
+
+		this.tracer.logTestOutput(runningCostOfBasketStr);
+		
 		// rounds up to whole number of cents
 		BigDecimal subTotalForDisplayAndTest = UnitTest
 				.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(subTotalInCents), myBasket.getCurrency())
 				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);
+		
+		
 		BigDecimal testSubTotal = UnitTest
 				.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(330L), myBasket.getCurrency())
 				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);
+
 		assertTrue("Test subtotal", subTotalForDisplayAndTest.equals(testSubTotal));
+
+		// we would hope that the basket is not losing the store money  
+		assertTrue(runningCostOfBasketToStoreInCents < subTotalInCents);
 
 		this.tracer.logTestOutput("-----------");
 
@@ -543,15 +565,21 @@ public class UnitTest {
 		this.tracer.logTestOutput("-----------");
 
 		String totalToPayReceiptLine = MessageFormat.format("Total to pay\t\t{0,number,####0.00}",
-				new Object[] { UnitTest.formatAmountForDisplayWithDecimals(
+				new Object[] { 
+						UnitTest.formatAmountForDisplayWithDecimals(
 						BigDecimal.valueOf(subTotalInCents - cumulativeSavings), myBasket.getCurrency()) 
 				});
 
 		this.tracer.logTestOutput(totalToPayReceiptLine);
 
+		// we would also hope that the basket is not losing the store money
+		// even after savings applied
+		assertTrue(runningCostOfBasketToStoreInCents < (subTotalInCents - cumulativeSavings));
+
 		this.tracer.logTestOutput(
 				"Audit log entry will be something like this (though printed to a persistent audit stream somewhere not to stdout):");
 
+		
 		AuditLogger logger = new TillAuditLogger();
 		try {
 			logger.logSale(myBasket);

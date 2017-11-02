@@ -1,5 +1,36 @@
+Objectives
+==========
 
-Salient design assumptions and structure:
+We should be able to achieve the following
+
+- cost a basket and show optimum (or at least, approved order of) savings
+- further, value an arbitrary set of goods based on both checkout price and supplied price
+- thus, work out the profit applicable to that arbitrary set of goods 
+- structure the design so that it is possible to work out if the same basket could be obtained cheaper from a different combination of 
+suppliers (maximised profit) but not necessarily to do this in first pass
+- keep simple audit trail via logging classs which wil write to console in delivered version
+
+Still to do 
+- could implement deal rules in full, currently only 2 deal types are demostrated (the 2 in the problem example)
+- if we wanted to test the operation of customers, tills etc with retrieval of data from elswhere (other systems) we could use the various actor classes
+but for this exercise, not really required. I could remove them but I thought I might as well leave them to demonstrate the possibility   
+
+Design assumptions:
+
+Fractional money and rounding rules - this will have to be addressed as intrinsic part of problem domain. Assumption is that rounding of fractions will be upwards. Where possible, use BigDecimal and 
+appropriate rounding, or float values
+
+Currency conversion tables - I will assume for simplicity that we are operating in a single currency though in the real world this might not be the case for a big supermarket. If we were to 
+handle this, I would add in a CurrencyAmount class which would contain a Currency and an amount
+
+It is ok to use anonymous classes in unit tests 
+
+Deals will be applied in order of the mnost advantageous by default
+
+Deals can be applied multiple times to the same basket
+
+
+Outline of class/interface structure:
 
 Stock items - oranges, cans of coke. Assume they will have attributes that describe things like
 - Cost (including unit of supply)
@@ -23,11 +54,6 @@ customers might then get to have this suggested to them as they go round the sto
 DealRules - e.g. BNGNF, XForPriceOfY. Need to be able to identify when this is applied to a basket and to return 
 set of applicable savings for a receipt. 
 
-Fractional money and rounding rules - this will have to be addressed as intrinsic part of problem domain
-
-Currency conversion tables - I will assume for simplicity that we are operating in a single currency though in the real world this might not be the case for a big supermarket. If we were to 
-handle this, I would add in a CurrencyAmount class which would contain a Currency and an amount
-
 Audit trails - supported will be
  - accounting ledger posts
  - till logs (receipts)
@@ -36,19 +62,6 @@ Audit trails - supported will be
  
  Basket - the shopping basket to which the above set of rules will be applied
 
-Should be able to achieve the following
-
-- cost a basket and show optimum (or at least, approved order of) savings
-- further, value an arbitrary set of goods based on both checkout price and supplied price
-- thus, work out the profit applicable to that arbitrary set of goods 
-- structure the design so that it is possible to work out if the same basket could be obtained cheaper from a different combination of 
-suppliers (maximised profit) but not necessarily to do this in first pass
-- keep simple audit trail via logging classs which wil write to console in delivered version
-
-Still to do 
-- could implement deal rules in full 
-- if we wanted to test the operation of customers, tills etc with retrieval of data from elswhere (other systems) we could use the various actor classes
-but for this exercise, not really required. I could remove them but I thought I might as well leave them to demonstrate the possibility   
 
 Current output of test is :
 
@@ -75,5 +88,5 @@ Beans		 0.50, price in cents is 50
 Beans		 0.50, price in cents is 50
 Coke		 0.70, price in cents is 70
 Coke		 0.70, price in cents is 70
-Oranges		 0.40, price in cents is 39
+Oranges		 0.40, price in cents is 40
 >. For now, just print to stdout

@@ -18,6 +18,14 @@ import com.qmetric.model.pricingmodels.Currency;
 public abstract class XForPriceOfY extends UniqueDealRules {
 	
 	private int numberOfItemsBought;
+	public int getNumberOfItemsBought() {
+		return numberOfItemsBought;
+	}
+
+	public int getNumberOfItemsCharged() {
+		return numberOfItemsCharged;
+	}
+
 	private int numberOfItemsCharged;
 	private List<StockItem> discountedItem = new ArrayList<StockItem>();
 	

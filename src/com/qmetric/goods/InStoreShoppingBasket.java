@@ -6,7 +6,6 @@ package com.qmetric.goods;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 
 import com.qmetric.model.dealrules.DealRules;

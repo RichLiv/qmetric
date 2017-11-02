@@ -3,7 +3,6 @@
  */
 package com.qmetric.goods;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.qmetric.model.dealrules.DealRules;

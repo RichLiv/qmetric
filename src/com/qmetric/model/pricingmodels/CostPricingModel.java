@@ -1,11 +1,11 @@
 package com.qmetric.model.pricingmodels;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
 
 import com.qmetric.actors.Supplier;
 import com.qmetric.goods.StockUnitsOfMeasure;
-import com.qmetric.model.pricingmodels.PricingModel;
 
 public class CostPricingModel implements PricingModel {
 
@@ -27,7 +27,7 @@ public class CostPricingModel implements PricingModel {
 
 	@Override
 	public BigDecimal getPriceInCents() {
-		return price;
+		return price.setScale(0, RoundingMode.HALF_UP);
 	}
 
 	public Supplier getSupplier() {
