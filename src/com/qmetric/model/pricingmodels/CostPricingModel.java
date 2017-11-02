@@ -29,7 +29,7 @@ public class CostPricingModel implements PricingModel {
 	public BigDecimal getPriceInCents() {
 		return price;
 	}
-	
+
 	public Supplier getSupplier() {
 		return supplier;
 	}

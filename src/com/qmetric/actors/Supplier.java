@@ -9,8 +9,12 @@ package com.qmetric.actors;
  */
 public interface Supplier {
 	public String getCompanyName();
+
 	public String getPrimaryContact();
+
 	public String getAddress();
+
 	public String getPrimaryEmail();
+
 	public String getPrimaryPhoneContact();
 }

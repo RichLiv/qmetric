@@ -15,13 +15,13 @@ import com.qmetric.model.pricingmodels.Currency;
  */
 public abstract class BuyXGetYFree extends UniqueDealRules {
 	public Collection<StockItem> getRelatedItems() {
-		return null; 
+		return null;
 	};
-	
-	public BigDecimal getTotalDealSaving(Currency requiredCurrency) {
+
+	public BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal) {
 		return BigDecimal.ZERO;
 	}
-	
+
 	public BigDecimal getBaseCost(Currency requiredCurrency) {
 		return BigDecimal.ZERO;
 	}

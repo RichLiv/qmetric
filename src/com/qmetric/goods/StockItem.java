@@ -14,8 +14,13 @@ import com.qmetric.model.pricingmodels.SimplePricingModel;
  */
 public interface StockItem { // to get order in receipt
 	public CostPricingModel getCostOfSupply();
+
 	public SimplePricingModel getPriceAtTill();
+
 	public String getName();
+
 	public String getReceiptLine();
-	public BigDecimal getQuantity(); // not always an int so to be safe, use safe arithmetic classes 
+
+	public BigDecimal getQuantity(); // not always an int so to be safe, use
+										// safe arithmetic classes
 }

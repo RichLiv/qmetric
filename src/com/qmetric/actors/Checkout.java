@@ -16,7 +16,9 @@ import com.qmetric.model.dealrules.DealPackage;
  *
  */
 public interface Checkout {
-	// returns a receipt (and probably does lots more but for this exercise a receipt is enough)
+	// returns a receipt (and probably does lots more but for this exercise a
+	// receipt is enough)
 	public List<String> checkout(ShoppingBasket basket, List<DealPackage> currentDeals);
+
 	public List<AuditLogger> getLoggers();
 }

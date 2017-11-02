@@ -14,15 +14,45 @@ import com.qmetric.model.pricingmodels.Currency;
  *
  */
 public abstract class XItemsWithDiscountY extends UniqueDealRules {
-	public Collection<StockItem> getRelatedItems() {
-		return null; 
-	};
+	private int numberOfItemsBought;
+	private int discountInCents;
+	private Collection<StockItem> relatedItems;
 	
-	public BigDecimal getTotalDealSaving(Currency requiredCurrency) {
-		return BigDecimal.ZERO;
+	/**
+	 * @param x - Number of items for discount if all the same 
+	 * @param y - discount in cents
+	 * @param relatedItems - either a single item to be used with x as the number for which discount is to be applied,
+	 * or a set of possible different items, in which case x is ignored
+	 */
+	public XItemsWithDiscountY(int x, int y, Collection<StockItem> relatedItems) {
+		this.numberOfItemsBought = x;
+		this.discountInCents = y;
+		this.relatedItems = relatedItems;
+		assert(x > 0);
+		assert(y > 0);
+		assert(relatedItems.size() > 0); // if 1, always discount this item
 	}
-	
+
+	/*
+	 * getRelatedItems needs to return a set of arbitrary items (can all be different)
+	 * @see com.qmetric.model.dealrules.DealRules#getRelatedItems()
+	 */
+	public Collection<StockItem> getRelatedItems() {
+		return this.relatedItems;
+	};
+
+	public BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal) {
+		return BigDecimal.valueOf(this.discountInCents); // fixed discount in this case
+	}
+
 	public BigDecimal getBaseCost(Currency requiredCurrency) {
-		return BigDecimal.ZERO;
+		assert(getRelatedItems().size() > 0);
+		BigDecimal totalCost = BigDecimal.ZERO;
+		for (StockItem nextItem : getRelatedItems())
+			totalCost.add(nextItem.getCostOfSupply().getPriceInCents()); // currency conversions maybe if necessary
+		if (relatedItems.size() == 1) {
+			totalCost.multiply(BigDecimal.valueOf(numberOfItemsBought));
+		}
+		return totalCost;
 	}
 }

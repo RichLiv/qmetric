@@ -8,7 +8,7 @@ package com.qmetric.model.pricingmodels;
  *
  */
 public interface Currency {
-	public static Currency GBP = new Currency() {
+	public static final Currency GBP = new Currency() {
 
 		@Override
 		public int getNumberOfDecimalPlaces() {
@@ -29,11 +29,15 @@ public interface Currency {
 		public String getIso4217AlpabeticCode() {
 			return "GBP";
 		}
-		
+
 	};
+
 	public int getNumberOfDecimalPlaces();
+
 	public String getCurrencySymbol();
+
 	public int getIso4217NumericCode();
+
 	public String getIso4217AlpabeticCode();
 
 }

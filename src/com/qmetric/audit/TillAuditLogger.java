@@ -14,7 +14,8 @@ public class TillAuditLogger implements AuditLogger {
 
 	@Override
 	public void logSale(ShoppingBasket basket) throws AuditFailureException {
-		System.out.println(new StringBuffer("Log this to the till: <").append(basket.toString()).append(">. For now, just print to stdout").toString());
+		System.out.println(new StringBuffer("Log this to the till: <").append(basket.toString())
+				.append(">. For now, just print to stdout").toString());
 	}
 
 }

@@ -15,7 +15,20 @@ import com.qmetric.model.pricingmodels.Currency;
  */
 public interface DealRules extends Comparable {
 	public Collection<StockItem> getRelatedItems();
-	public BigDecimal getTotalDealSaving(Currency requiredCurrency); // although for now we will stick with one
-	public BigDecimal getBaseCost(Currency requiredCurrency); // although for now we will stick with one
+
+	public BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal); // although
+																		// for
+																		// now
+																		// we
+																		// will
+																		// stick
+																		// with
+																		// one
+
+	public BigDecimal getBaseCost(Currency requiredCurrency); // although for
+																// now we will
+																// stick with
+																// one
+
 	public String getReceiptLine();
 }

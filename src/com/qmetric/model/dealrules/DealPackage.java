@@ -15,5 +15,6 @@ import com.qmetric.goods.ShoppingBasket;
  */
 public interface DealPackage {
 	public void addRules(DealRules deal);
+
 	public List<DealRules> getApplicableRules(ShoppingBasket b);
 }

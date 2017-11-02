@@ -9,8 +9,10 @@ package com.qmetric.actors;
  */
 public interface Customer {
 	public String getName();// etc
+
 	public String getAddress();// etc
+
 	public String getLoyaltyCardNumber(); // maybe
-	
+
 	// and so on
 }

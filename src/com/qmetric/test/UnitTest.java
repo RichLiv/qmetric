@@ -19,6 +19,7 @@ import org.junit.Test;
 import com.qmetric.actors.Supplier;
 import com.qmetric.audit.AuditLogger;
 import com.qmetric.audit.TillAuditLogger;
+import com.qmetric.audit.TraceLogger;
 import com.qmetric.exception.AuditFailureException;
 import com.qmetric.goods.InStoreShoppingBasket;
 import com.qmetric.goods.ShoppingBasket;
@@ -41,25 +42,56 @@ public class UnitTest {
 	private StockItem coke;
 	private StockItem bakedBeans;
 	private Calendar lastStockCycleDate;
-	private Calendar expiryDate; // refers to the price though we could just as easily enhance to check use by dates etc
+	private Calendar expiryDate; // refers to the price though we could just as
+									// easily enhance to check use by dates etc
+	private TraceLogger tracer;
 
-	private static final String basicReceiptLine = "{0}\t\t {1,number,#####0.00}"; // refine this to take account of number of decimals in currency if more time available 
+	private static final String BASIC_RECEIPT_LINE_FORMAT = "{0}\t\t {1,number,#####0.00}"; // refine
+	// this
+	// to
+	// take
+	// account
+	// of
+	// number
+	// of
+	// decimals
+	// in
+	// currency
+	// if
+	// more
+	// time
+	// available
 
+	/*
+	 * Adapter to enable JUnit4
+	 */
 	public static junit.framework.Test suite() {
 		return new junit.framework.JUnit4TestAdapter(UnitTest.class);
 	}
-
 
 	/*
 	 * All this would come from central store systems
 	 */
 	@Before
 	public void setUp() throws Exception {
-		// for the sake of testing we will not use this field for now but it would come froma stock control system and could be used to compare potential profit margins in a real system with different dates for tranches of the same stock orders 
-		this.lastStockCycleDate = Calendar.getInstance(TimeZone.getDefault()); // ensure we observe timezone properly
+		this.tracer = new TraceLogger();
+
+		// for the sake of testing we will not use this field for now but it
+		// would come from a stock control system and could be used to compare
+		// potential profit margins in a real system with different dates for
+		// tranches of the same stock orders
+		this.lastStockCycleDate = Calendar.getInstance(TimeZone.getDefault()); // ensure
+																				// we
+																				// observe
+																				// timezone
+																				// properly
 		this.lastStockCycleDate.add(Calendar.MONTH, -3);// three months ago
 
-		this.expiryDate = Calendar.getInstance(TimeZone.getDefault()); // ensure we observe timezone properly
+		this.expiryDate = Calendar.getInstance(TimeZone.getDefault()); // ensure
+																		// we
+																		// observe
+																		// timezone
+																		// properly
 		this.expiryDate.add(Calendar.MONTH, 3);// three months time
 
 		this.fruitSupplier = new Supplier() {
@@ -87,9 +119,9 @@ public class UnitTest {
 			public String getPrimaryPhoneContact() {
 				return "003412345678";
 			}
-			
+
 		};
-		
+
 		this.tinnedGoodsSupplier = new Supplier() {
 			@Override
 			public String getCompanyName() {
@@ -115,7 +147,7 @@ public class UnitTest {
 			public String getPrimaryPhoneContact() {
 				return "023222333";
 			}
-			
+
 		};
 
 		this.oranges = new StockItem() {
@@ -129,19 +161,22 @@ public class UnitTest {
 
 					@Override
 					public Currency getCurrency() {
-						return Currency.GBP; // in future we might want to specify in euros and include exchange rate in Currency
-						// we could then do up to the minute mark to market valuations on sales.  
+						return Currency.GBP; // in future we might want to
+												// specify in euros and include
+												// exchange rate in Currency
+						// we could then do up to the minute mark to market
+						// valuations on sales.
 					}
 
 					@Override
 					public BigDecimal getPriceInCents() {
 						return BigDecimal.valueOf(23); // I made this up ;-)
 					}
-					
+
 					public Supplier getSupplier() {
 						return UnitTest.this.fruitSupplier;
 					}
-					
+
 					@Override
 					public Calendar getDateInForce() {
 						return UnitTest.this.lastStockCycleDate;
@@ -149,12 +184,16 @@ public class UnitTest {
 
 				};
 			}
+
 			@Override
 			public SimplePricingModel getPriceAtTill() {
 				return new SimplePricingModel() {
 					@Override
 					public StockUnitsOfMeasure getUnits() {
-						return StockUnitsOfMeasure.KGS; // or LBS but then we would need to introduce weight conversions too
+						return StockUnitsOfMeasure.KGS; // or LBS but then we
+														// would need to
+														// introduce weight
+														// conversions too
 					}
 
 					@Override
@@ -164,7 +203,9 @@ public class UnitTest {
 
 					@Override
 					public BigDecimal getPriceInCents() {
-						return BigDecimal.valueOf(199D * getQuantity().doubleValue());
+						return BigDecimal.valueOf(199L)
+							.multiply(getQuantity())
+							.setScale(0, RoundingMode.HALF_UP);
 					}
 
 					@Override
@@ -177,23 +218,28 @@ public class UnitTest {
 					}
 				};
 			}
+
 			@Override
 			public String getName() {
 				return "Oranges";
 			}
+
 			@Override
 			public String getReceiptLine() {
-				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(), getPriceAtTill().getCurrency());
-				return MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(),
+						getPriceAtTill().getCurrency());
+				return MessageFormat.format(BASIC_RECEIPT_LINE_FORMAT, new Object[] { getName(), amountLocal });
 			}
+
 			@Override
 			public BigDecimal getQuantity() {
 				return BigDecimal.valueOf(0.2F);
 			}
-			
+
 			public String toString() {
 				// for logging. Could add units etc etc if we wanted
-				return new StringBuffer(getReceiptLine()).append(", price in cents is ").append(getPriceAtTill().getPriceInCents().intValue()).toString();
+				return new StringBuffer(getReceiptLine()).append(", price in cents is ")
+						.append(getPriceAtTill().getPriceInCents().intValue()).toString();
 			}
 		};
 
@@ -215,19 +261,23 @@ public class UnitTest {
 					public BigDecimal getPriceInCents() {
 						return BigDecimal.valueOf(13); // I made this up ;-)
 					}
-					
+
 					public Supplier getSupplier() {
 						return UnitTest.this.tinnedGoodsSupplier;
 					}
 
 				};
 			}
+
 			@Override
 			public SimplePricingModel getPriceAtTill() {
 				return new SimplePricingModel() {
 					@Override
 					public StockUnitsOfMeasure getUnits() {
-						return StockUnitsOfMeasure.NUMBER; // coke might be in supplied in packs of N, yet another modelling twist  
+						return StockUnitsOfMeasure.NUMBER; // coke might be in
+															// supplied in packs
+															// of N, yet another
+															// modelling twist
 					}
 
 					@Override
@@ -250,22 +300,28 @@ public class UnitTest {
 					}
 				};
 			}
+
 			@Override
 			public String getName() {
 				return "Coke";
 			}
+
 			@Override
 			public String getReceiptLine() {
-				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(), getPriceAtTill().getCurrency());
-				return MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(),
+						getPriceAtTill().getCurrency());
+				return MessageFormat.format(BASIC_RECEIPT_LINE_FORMAT, new Object[] { getName(), amountLocal });
 			}
+
 			@Override
 			public BigDecimal getQuantity() {
 				return BigDecimal.ONE;
 			}
+
 			public String toString() {
 				// for logging. Could add units etc etc if we wanted
-				return new StringBuffer(getReceiptLine()).append(", price in cents is ").append(getPriceAtTill().getPriceInCents().intValue()).toString();
+				return new StringBuffer(getReceiptLine()).append(", price in cents is ")
+						.append(getPriceAtTill().getPriceInCents().intValue()).toString();
 			}
 		};
 
@@ -287,18 +343,22 @@ public class UnitTest {
 					public BigDecimal getPriceInCents() {
 						return BigDecimal.valueOf(8); // I made this up ;-)
 					}
-					
+
 					public Supplier getSupplier() {
 						return UnitTest.this.tinnedGoodsSupplier;
 					}
 				};
 			}
+
 			@Override
 			public SimplePricingModel getPriceAtTill() {
 				return new SimplePricingModel() {
 					@Override
 					public StockUnitsOfMeasure getUnits() {
-						return StockUnitsOfMeasure.NUMBER; // coke might be in supplied in packs of N, yet another modelling twist  
+						return StockUnitsOfMeasure.NUMBER; // coke might be in
+															// supplied in packs
+															// of N, yet another
+															// modelling twist
 					}
 
 					@Override
@@ -321,25 +381,31 @@ public class UnitTest {
 					}
 				};
 			}
+
 			@Override
 			public String getName() {
 				return "Beans";
 			}
+
 			@Override
 			public String getReceiptLine() {
-				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(), getPriceAtTill().getCurrency());
-				return MessageFormat.format(basicReceiptLine, new Object[] {getName(), amountLocal});
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getPriceAtTill().getPriceInCents(),
+						getPriceAtTill().getCurrency());
+				return MessageFormat.format(BASIC_RECEIPT_LINE_FORMAT, new Object[] { getName(), amountLocal });
 			}
+
 			@Override
 			public BigDecimal getQuantity() {
 				return BigDecimal.ONE;
 			}
+
 			public String toString() {
 				// for logging. Could add units etc etc if we wanted
-				return new StringBuffer(getReceiptLine()).append(", price in cents is ").append(getPriceAtTill().getPriceInCents().intValue()).toString();
+				return new StringBuffer(getReceiptLine()).append(", price in cents is ")
+						.append(getPriceAtTill().getPriceInCents().intValue()).toString();
 			}
 		};
-		
+
 	}
 
 	@After
@@ -347,181 +413,163 @@ public class UnitTest {
 	}
 
 	@Test
-	public void test() { 
-		
-		// now the basic scaffolding is in place, next thing is to add the tests before implementing the 
+	public void test() {
+
+		// now the basic scaffolding is in place, next thing is to add the tests
+		// before implementing the
 		// classes in full
-		
+
 		ShoppingBasket myBasket = new InStoreShoppingBasket();
-		
+
 		myBasket.addItemToBasket(this.oranges);
 		myBasket.addItemToBasket(this.coke);
 		myBasket.addItemToBasket(this.coke);
 		myBasket.addItemToBasket(this.bakedBeans);
 		myBasket.addItemToBasket(this.bakedBeans);
 		myBasket.addItemToBasket(this.bakedBeans);
-		
+
 		// order of receipt
 		myBasket.getItems().sort(new Comparator<StockItem>() {
 
 			@Override
-			public int compare(StockItem o1, StockItem o2) {
-				return o1.getName().compareTo(o2.getName());
+			public int compare(StockItem first, StockItem second) {
+				return first.getName().compareTo(second.getName());
 			}
 		});
-		
+
 		// again, from store systems, these would be fairly fluid in reality
 		// represents one way of applying the rules only
-		DealPackage dealRules = new OrderlyDealPackage();
-		dealRules.addRules(new XForPriceOfY() {
-			public Collection<StockItem> getRelatedItems() {
-				return Arrays.asList(new StockItem[] {
-						UnitTest.this.bakedBeans,
-						UnitTest.this.bakedBeans,
-						UnitTest.this.bakedBeans
-						});
-			};
-			
-			public BigDecimal getTotalDealSaving(Currency requiredCurrency) {
-				return UnitTest.this.bakedBeans.getPriceAtTill().getPriceInCents(); // convert - or we could use a CurrencyAmount class as an enhancement to encapsulate the currency a bit more if we were really calculating conversions 
-			}
-			
-			public BigDecimal getBaseCost(Currency requiredCurrency) {
-				return UnitTest.this.bakedBeans.getPriceAtTill().getPriceInCents().multiply(BigDecimal.valueOf(getRelatedItems().size()));
-			}
+		DealPackage dealRules = new OrderlyDealPackage(
+		new XForPriceOfY(3,2, UnitTest.this.bakedBeans) {
 
+			/*
+			 * This will always be locally defined
+			 * @see com.qmetric.model.dealrules.DealRules#getReceiptLine()
+			 */
 			@Override
 			public String getReceiptLine() {
-				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(getTotalDealSaving(UnitTest.this.bakedBeans.getPriceAtTill().getCurrency()), UnitTest.this.bakedBeans.getPriceAtTill().getCurrency());
-				String receiptLine = MessageFormat.format("{0} {1} for {2}\t\t-{3,number,####0.00}", 
-						new Object[] {
-								UnitTest.this.bakedBeans.getName(),
-								getRelatedItems().size(),
-								getRelatedItems().size()-1,
-								amountLocal
-						});
+				BigDecimal amountLocal = UnitTest.formatAmountForDisplayWithDecimals(
+						getTotalDealSaving(UnitTest.this.bakedBeans.getPriceAtTill().getCurrency(),1),
+						UnitTest.this.bakedBeans.getPriceAtTill().getCurrency());
+				String receiptLine = MessageFormat.format("{0} {1} for {2}\t\t-{3,number,####0.00}",
+						new Object[] { UnitTest.this.bakedBeans.getName(), getRelatedItems().size(),
+								getRelatedItems().size() - 1, amountLocal });
 				return receiptLine;
 			}
 		});
-		dealRules.addRules(new XItemsWithDiscountY() {
-			public Collection<StockItem> getRelatedItems() {
-				return Arrays.asList(new StockItem[] {
-						UnitTest.this.coke,
-						UnitTest.this.coke
-						});
-			};
-			
-			public BigDecimal getTotalDealSaving(Currency requiredCurrency) {
-				return BigDecimal.valueOf(40); // fixed discount in this case 
-			}
-			
-			public BigDecimal getBaseCost(Currency requiredCurrency) {
-				return UnitTest.this.coke.getPriceAtTill().getPriceInCents().multiply(BigDecimal.valueOf(getRelatedItems().size()));
-			}
+		dealRules.addRules(
+			new XItemsWithDiscountY(
+				2, 
+				40, 
+				Arrays.asList(new StockItem[] { UnitTest.this.coke })) {
 
-			@Override
-			public String getReceiptLine() {
-				// adjust decimal places for printing
-				BigDecimal actualAmountPaid = getBaseCost(UnitTest.this.coke.getPriceAtTill().getCurrency()).subtract(getTotalDealSaving(UnitTest.this.coke.getPriceAtTill().getCurrency()));
-				actualAmountPaid = UnitTest.formatAmountForDisplayWithDecimals(actualAmountPaid, UnitTest.this.coke.getPriceAtTill().getCurrency());
-				BigDecimal totalSaving = getTotalDealSaving(UnitTest.this.coke.getPriceAtTill().getCurrency());
-				totalSaving = UnitTest.formatAmountForDisplayWithDecimals(totalSaving, UnitTest.this.coke.getPriceAtTill().getCurrency());
-				String receiptLine = MessageFormat.format("{0} {1} for {2}{3}\t\t-{4,number,####0.00}", 
-						new Object[] {
-								UnitTest.this.coke.getName(),
-								getRelatedItems().size(),
-								UnitTest.this.coke.getPriceAtTill().getCurrency().getCurrencySymbol(),
-								actualAmountPaid,
-								totalSaving
-						});
-				
+				@Override
+				/*
+				 * @see com.qmetric.model.dealrules.DealRules#getReceiptLine()
+				 */
+				public String getReceiptLine() {
+					// adjust decimal places for printing
+					BigDecimal actualAmountPaid = getBaseCost(UnitTest.this.coke.getPriceAtTill().getCurrency())
+						.subtract(getTotalDealSaving(UnitTest.this.coke.getPriceAtTill().getCurrency(),0));
+					actualAmountPaid = UnitTest.formatAmountForDisplayWithDecimals(actualAmountPaid,
+						UnitTest.this.coke.getPriceAtTill().getCurrency());
+					BigDecimal totalSaving = getTotalDealSaving(UnitTest.this.coke.getPriceAtTill().getCurrency(),0);
+					totalSaving = UnitTest.formatAmountForDisplayWithDecimals(totalSaving,
+						UnitTest.this.coke.getPriceAtTill().getCurrency());
+					String receiptLine = MessageFormat.format("{0} {1} for {2}{3}\t\t-{4,number,####0.00}",
+						new Object[] { UnitTest.this.coke.getName(), getRelatedItems().size(),
+								UnitTest.this.coke.getPriceAtTill().getCurrency().getCurrencySymbol(), actualAmountPaid,
+								totalSaving });
+
 				return receiptLine;
 			}
-			
+
 		});
 
 		float subTotalInCents = 0.00F;
-		
+
 		for (StockItem nextItem : myBasket.getItems()) {
-			System.out.println(nextItem.getReceiptLine());
-			BigDecimal incrementToSubTotal = nextItem.getPriceAtTill().getPriceInCents();
-			subTotalInCents += incrementToSubTotal.floatValue(); 
+			assertTrue(nextItem.getReceiptLine() != null && nextItem.getReceiptLine().length() > 0);
+			this.tracer.logTestOutput(nextItem.getReceiptLine());
+			assertTrue(nextItem.getPriceAtTill().getPriceInCents().floatValue() > 0.00F);
+			final BigDecimal incrementToSubTotal = nextItem.getPriceAtTill().getPriceInCents();
+			subTotalInCents += incrementToSubTotal.floatValue();
 		}
 
-		// rounds up to whole number of cents 
-		BigDecimal subTotalForDisplayAndTest = UnitTest.formatAmountForDisplayWithDecimals(
-				BigDecimal.valueOf(subTotalInCents), myBasket.getCurrency())
-				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
-		BigDecimal testSubTotal = UnitTest.formatAmountForDisplayWithDecimals(
-				BigDecimal.valueOf(330L), myBasket.getCurrency())
-				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP); 
+		// rounds up to whole number of cents
+		BigDecimal subTotalForDisplayAndTest = UnitTest
+				.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(subTotalInCents), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);
+		BigDecimal testSubTotal = UnitTest
+				.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(330L), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);
 		assertTrue("Test subtotal", subTotalForDisplayAndTest.equals(testSubTotal));
-		
-		System.out.println("-----------");
 
-		String subTotalReceiptLine = MessageFormat.format("Sub-total\t\t{0,number,####0.00}", 
-				new Object[] {
-					subTotalForDisplayAndTest
-				});
+		this.tracer.logTestOutput("-----------");
 
-		System.out.println(subTotalReceiptLine);
-		System.out.println("");
-		System.out.println("Savings");
-		
-		// logic in here is not implemented but it is structured such that adding it is fairly trivial
+		String subTotalReceiptLine = MessageFormat.format("Sub-total\t\t{0,number,####0.00}",
+				new Object[] { subTotalForDisplayAndTest });
+
+		this.tracer.logTestOutput(subTotalReceiptLine);
+		this.tracer.logTestOutput("");
+		this.tracer.logTestOutput("Savings");
+
+		// logic in here is not implemented but it is structured such that
+		// adding it is fairly trivial
 		List<DealRules> appliedRules = dealRules.getApplicableRules(myBasket);
 
 		float cumulativeSavings = 0.00F;
 		for (DealRules nextRuleApplied : appliedRules) {
-			cumulativeSavings += nextRuleApplied.getTotalDealSaving(myBasket.getCurrency()).floatValue();
-			System.out.println(nextRuleApplied.getReceiptLine());
+			assertTrue(myBasket.numberOfMatches(nextRuleApplied) == 1); // for this set of test data
+			cumulativeSavings += nextRuleApplied.getTotalDealSaving(myBasket.getCurrency(), myBasket.numberOfMatches(nextRuleApplied)).floatValue();
+			this.tracer.logTestOutput(nextRuleApplied.getReceiptLine());
 		}
 
-		BigDecimal cumulativeSavingsForDisplayAndTest = UnitTest.formatAmountForDisplayWithDecimals(
-				BigDecimal.valueOf(cumulativeSavings), myBasket.getCurrency())
-				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
-		BigDecimal testCumulativeSavings = UnitTest.formatAmountForDisplayWithDecimals(
-				BigDecimal.valueOf(90L), myBasket.getCurrency())
-				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(),RoundingMode.HALF_UP); 
+		BigDecimal cumulativeSavingsForDisplayAndTest = UnitTest
+				.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(cumulativeSavings), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);
+		BigDecimal testCumulativeSavings = UnitTest
+				.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(90L), myBasket.getCurrency())
+				.setScale(myBasket.getCurrency().getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);
 		assertTrue("Test subtotal", cumulativeSavingsForDisplayAndTest.equals(testCumulativeSavings));
 
-		
-		System.out.println("\t\t\t------");
+		this.tracer.logTestOutput("\t\t\t------");
 
-		String totalSavingsReceiptLine = MessageFormat.format("Total savings\t\t-{0,number,####0.00}", 
-				new Object[] {
-						cumulativeSavingsForDisplayAndTest
+		String totalSavingsReceiptLine = MessageFormat.format("Total savings\t\t-{0,number,####0.00}",
+				new Object[] { cumulativeSavingsForDisplayAndTest });
+
+		this.tracer.logTestOutput(totalSavingsReceiptLine);
+
+		this.tracer.logTestOutput("-----------");
+
+		String totalToPayReceiptLine = MessageFormat.format("Total to pay\t\t{0,number,####0.00}",
+				new Object[] { UnitTest.formatAmountForDisplayWithDecimals(
+						BigDecimal.valueOf(subTotalInCents - cumulativeSavings), myBasket.getCurrency()) 
 				});
 
-		System.out.println(totalSavingsReceiptLine);
-		
-		System.out.println("-----------");
+		this.tracer.logTestOutput(totalToPayReceiptLine);
 
-		String totalToPayReceiptLine = MessageFormat.format("Total to pay\t\t{0,number,####0.00}", 
-				new Object[] {
-					UnitTest.formatAmountForDisplayWithDecimals(BigDecimal.valueOf(subTotalInCents - cumulativeSavings), myBasket.getCurrency()) // could introduce a basket currency if we wanted
-				});
-
-		System.out.println(totalToPayReceiptLine);
-
-		System.out.println("Audit log entry will be something like this (though printed to a persistent audit stream somewhere not to stdout):");
+		this.tracer.logTestOutput(
+				"Audit log entry will be something like this (though printed to a persistent audit stream somewhere not to stdout):");
 
 		AuditLogger logger = new TillAuditLogger();
 		try {
 			logger.logSale(myBasket);
 		} catch (AuditFailureException e) {
-			e.printStackTrace();
-			assertTrue(e.getMessage(),false);
+			this.tracer.logOutput("Failed to log sale", e);
+			assertTrue(e.getMessage(), false); // force failure
 		}
 
-		// if we wanted to make this more fully features, we would construct a whole raft of different deal rules and test each here in the same way
-		// as that's not the point of the exercise, I'm not going down that route 
+		// if we wanted to make this more fully features, we would construct a
+		// whole raft of different deal rules and test each here in the same way
+		// as that's not the point of the exercise, I'm not going down that
+		// route
 	}
-	
+
 	private static BigDecimal formatAmountForDisplayWithDecimals(BigDecimal amount, Currency currency) {
 		// avoid rounding issues
-		BigDecimal amountLocal = amount.setScale(currency.getNumberOfDecimalPlaces(),RoundingMode.HALF_UP);
-		amountLocal = amountLocal.scaleByPowerOfTen(-1*currency.getNumberOfDecimalPlaces());
+		BigDecimal amountLocal = amount.setScale(currency.getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);
+		amountLocal = amountLocal.scaleByPowerOfTen(-1 * currency.getNumberOfDecimalPlaces());
 		return amountLocal;
 	}
 }
