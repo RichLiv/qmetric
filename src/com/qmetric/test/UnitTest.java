@@ -44,22 +44,8 @@ public class UnitTest {
 	private Calendar expiryDate; // refers to the price though we could just as
 									// easily enhance to check use by dates etc
 	private TraceLogger tracer;
-
-	private static final String BASIC_RECEIPT_LINE_FORMAT = "{0}\t\t {1,number,#####0.00}"; // refine
-	// this
-	// to
-	// take
-	// account
-	// of
-	// number
-	// of
-	// decimals
-	// in
-	// currency
-	// if
-	// more
-	// time
-	// available
+	
+	private static final String BASIC_RECEIPT_LINE_FORMAT = "{0}\t\t {1,number,#####0.00###}"; 
 
 	/*
 	 * Adapter to enable JUnit4
@@ -69,7 +55,7 @@ public class UnitTest {
 	}
 
 	/*
-	 * All this would come from central store systems
+	 * All this would come from central store systems probably but in general, set any resources needed up here
 	 */
 	@Before
 	public void setUp() throws Exception {
@@ -407,10 +393,18 @@ public class UnitTest {
 
 	}
 
+	/**
+	 * Celear down resources
+	 * 
+	 * @throws Exception
+	 */
 	@After
 	public void tearDown() throws Exception {
 	}
 
+	/**
+	 * Run some tests
+	 */
 	@Test
 	public void test() {
 
@@ -438,8 +432,8 @@ public class UnitTest {
 
 		// again, from store systems, these would be fairly fluid in reality
 		// represents one way of applying the rules only
-		DealPackage dealRules = new OrderlyDealPackage(
-		new XForPriceOfY(3,2, UnitTest.this.bakedBeans) {
+		DealPackage dealRules = new OrderlyDealPackage();
+		dealRules.addRules(new XForPriceOfY(3,2, UnitTest.this.bakedBeans) {
 
 			/*
 			 * This will always be locally defined
@@ -594,6 +588,11 @@ public class UnitTest {
 		// route
 	}
 
+	/**
+	 * @param amount
+	 * @param currency
+	 * @return
+	 */
 	private static BigDecimal formatAmountForDisplayWithDecimals(BigDecimal amount, Currency currency) {
 		// avoid rounding issues
 		BigDecimal amountLocal = amount.setScale(currency.getNumberOfDecimalPlaces(), RoundingMode.HALF_UP);

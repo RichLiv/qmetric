@@ -18,24 +18,32 @@ import com.qmetric.goods.ShoppingBasket;
  *
  */
 public class OrderlyDealPackage implements DealPackage {
-	// could order using TreeSet but more likely that explicit ordering will
-	// take place either due to basket contents
-	// or from store staff
+	/**
+	 * Could order using TreeSet but more likely that 
+	 * explicit ordering will take place either due to 
+	 * basket contents or from store staff 
+	 */
 	private final List<DealRules> rulesForDeal = new ArrayList<DealRules>();
 
-	public OrderlyDealPackage(DealRules deal) {
-		addRules(deal);
+	/**
+	 */
+	public OrderlyDealPackage() {
 	}
 
+	/* (non-Javadoc)
+	 * @see com.qmetric.model.dealrules.DealPackage#addRules(com.qmetric.model.dealrules.DealRules)
+	 */
 	public void addRules(DealRules deal) {
 		this.rulesForDeal.add(deal);
 	}
 
-	/*
+	/* 
 	 * Returns deals that can be applied to this basket in the order of most
 	 * advantageous (most saving to the consumer). SImplistic in that it doesn't
 	 * try and combine deals to give the best result - just tests each deal in
 	 * isolation. A real world solution would do the former
+
+	 * @see com.qmetric.model.dealrules.DealPackage#getApplicableRules(com.qmetric.goods.ShoppingBasket)
 	 */
 	public List<DealRules> getApplicableRules(ShoppingBasket basket) {
 		final HashMap<DealRules, BigDecimal> valueOfDealsForThisBasket = new HashMap<DealRules, BigDecimal>();

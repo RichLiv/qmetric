@@ -14,15 +14,18 @@ import com.qmetric.model.pricingmodels.Currency;
  *
  */
 public abstract class BuyXGetYFree extends UniqueDealRules {
-	public Collection<StockItem> getRelatedItems() {
-		return null;
-	};
+	/* (non-Javadoc)
+	 * @see com.qmetric.model.dealrules.DealRules#getRelatedItems()
+	 */
+	public abstract Collection<StockItem> getRelatedItems();
 
-	public BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal) {
-		return BigDecimal.ZERO;
-	}
+	/* (non-Javadoc)
+	 * @see com.qmetric.model.dealrules.DealRules#getTotalDealSaving(com.qmetric.model.pricingmodels.Currency, int)
+	 */
+	public abstract BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal);
 
-	public BigDecimal getBaseCost(Currency requiredCurrency) {
-		return BigDecimal.ZERO;
-	}
+	/* (non-Javadoc)
+	 * @see com.qmetric.model.dealrules.DealRules#getBaseCost(com.qmetric.model.pricingmodels.Currency)
+	 */
+	public abstract BigDecimal getBaseCost(Currency requiredCurrency);
 }

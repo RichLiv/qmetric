@@ -16,10 +16,16 @@ import com.qmetric.model.pricingmodels.Currency;
  */
 public abstract class XItemsWithDiscountY extends UniqueDealRules {
 	private int numberOfItemsBought;
+	/**
+	 * @return
+	 */
 	public int getNumberOfItemsBought() {
 		return numberOfItemsBought;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getDiscountInCents() {
 		return discountInCents;
 	}
@@ -50,10 +56,16 @@ public abstract class XItemsWithDiscountY extends UniqueDealRules {
 		return this.relatedItems;
 	};
 
+	/* (non-Javadoc)
+	 * @see com.qmetric.model.dealrules.DealRules#getTotalDealSaving(com.qmetric.model.pricingmodels.Currency, int)
+	 */
 	public BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal) {
 		return BigDecimal.valueOf(this.discountInCents); // fixed discount in this case
 	}
 
+	/* (non-Javadoc)
+	 * @see com.qmetric.model.dealrules.DealRules#getBaseCost(com.qmetric.model.pricingmodels.Currency)
+	 */
 	public BigDecimal getBaseCost(Currency requiredCurrency) {
 		assert(getRelatedItems().size() > 0);
 		float totalCost = 0.00F;
@@ -64,5 +76,13 @@ public abstract class XItemsWithDiscountY extends UniqueDealRules {
 			totalCost *= numberOfItemsBought;
 		}
 		return BigDecimal.valueOf(totalCost).setScale(0, RoundingMode.HALF_UP);
+	}
+
+	/* Always returns 0 as we don't need to sort it for now
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(Object other) {
+		return 0;
 	}
 }

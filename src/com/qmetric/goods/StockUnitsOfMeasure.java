@@ -3,11 +3,13 @@
  */
 package com.qmetric.goods;
 
+import java.io.Serializable;
+
 /**
  * @author Richard Livingstone
  *
  */
-public interface StockUnitsOfMeasure {
+public interface StockUnitsOfMeasure extends Serializable{
 	public static StockUnitsOfMeasure LBS = new StockUnitsOfMeasure() {
 		public String getName() {
 			return "Pound(s)";
@@ -59,7 +61,14 @@ public interface StockUnitsOfMeasure {
 		}
 	};
 
-	public String getName();
+	/**
+	 * @return
+	 */
+	String getName();
 
-	public StockUnitsOfMeasure convertTo(StockUnitsOfMeasure otherUnit);
+	/**
+	 * @param otherUnit
+	 * @return
+	 */
+	StockUnitsOfMeasure convertTo(StockUnitsOfMeasure otherUnit);
 }

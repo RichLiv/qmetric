@@ -4,7 +4,15 @@
  */
 package com.qmetric.exception;
 
+/**
+ * @author Richard Livingstone
+ *
+ */
 public class AuditFailureException extends BaseException {
+	/**
+	 * @param msg
+	 * @param origin
+	 */
 	public AuditFailureException(String msg, Throwable origin) {
 		super(msg, origin);
 	}

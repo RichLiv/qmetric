@@ -3,6 +3,7 @@
  */
 package com.qmetric.model.dealrules;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -13,20 +14,32 @@ import com.qmetric.model.pricingmodels.Currency;
  * @author Richard Livingstone
  *
  */
-public interface DealRules extends Comparable {
-	public Collection<StockItem> getRelatedItems();
+/**
+ * @author Richard Livingstone
+ *
+ */
+public interface DealRules extends Comparable, Serializable  {
+	/**
+	 * @return
+	 */
+	Collection<StockItem> getRelatedItems();
 
 	/**
 	 * @param requiredCurrency
 	 * @param numberOfApplicationsOfDeal - depending on the basket, this deal could be applied multiple times 
 	 * @return
 	 */
-	public BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal);
+	BigDecimal getTotalDealSaving(Currency requiredCurrency, int numberOfApplicationsOfDeal);
 
-	/*
+	/**
 	 * Cost of items in deal before saving
+	 * @param requiredCurrency
+	 * @return
 	 */
-	public BigDecimal getBaseCost(Currency requiredCurrency); 
+	BigDecimal getBaseCost(Currency requiredCurrency); 
 
-	public String getReceiptLine();
+	/**
+	 * @return
+	 */
+	String getReceiptLine();
 }

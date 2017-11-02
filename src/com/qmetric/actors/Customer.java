@@ -8,10 +8,19 @@ package com.qmetric.actors;
  *
  */
 public interface Customer {
+	/**
+	 * @return
+	 */
 	public String getName();// etc
 
+	/**
+	 * @return
+	 */
 	public String getAddress();// etc
 
+	/**
+	 * @return
+	 */
 	public String getLoyaltyCardNumber(); // maybe
 
 	// and so on

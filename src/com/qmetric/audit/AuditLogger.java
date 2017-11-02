@@ -13,5 +13,9 @@ import com.qmetric.goods.ShoppingBasket;
  *
  */
 public interface AuditLogger extends Serializable {
+	/**
+	 * @param basket
+	 * @throws AuditFailureException
+	 */
 	public void logSale(ShoppingBasket basket) throws AuditFailureException;
 }

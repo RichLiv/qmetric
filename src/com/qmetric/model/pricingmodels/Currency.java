@@ -3,11 +3,13 @@
  */
 package com.qmetric.model.pricingmodels;
 
+import java.io.Serializable;
+
 /**
  * @author Richard Livingstone
  *
  */
-public interface Currency {
+public interface Currency extends Serializable {
 	public static final Currency GBP = new Currency() {
 
 		@Override
@@ -32,12 +34,24 @@ public interface Currency {
 
 	};
 
-	public int getNumberOfDecimalPlaces();
+	/**
+	 * @return
+	 */
+	int getNumberOfDecimalPlaces();
 
-	public String getCurrencySymbol();
+	/**
+	 * @return
+	 */
+	String getCurrencySymbol();
 
-	public int getIso4217NumericCode();
+	/**
+	 * @return
+	 */
+	int getIso4217NumericCode();
 
-	public String getIso4217AlpabeticCode();
+	/**
+	 * @return
+	 */
+	String getIso4217AlpabeticCode();
 
 }

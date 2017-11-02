@@ -12,6 +12,9 @@ import com.qmetric.goods.ShoppingBasket;
  *
  */
 public class ErrorLogger implements AuditLogger {
+	/* (non-Javadoc)
+	 * @see com.qmetric.audit.AuditLogger#logSale(com.qmetric.goods.ShoppingBasket)
+	 */
 	@Override
 	public void logSale(ShoppingBasket basket) throws AuditFailureException {
 		System.out.println(new StringBuffer("Log this to file using logback or similar <").append(basket.toString())
