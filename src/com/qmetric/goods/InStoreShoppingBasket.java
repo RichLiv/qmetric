@@ -6,6 +6,7 @@ package com.qmetric.goods;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 import com.qmetric.model.pricingmodels.Currency;
@@ -31,5 +32,21 @@ public class InStoreShoppingBasket implements ShoppingBasket {
 			ret.append(nextOne.toString()).append("\n");
 		}
 		return ret.toString();
+	}
+	@Override
+	public int numberOfMatches(Collection<StockItem> dealComponents) {
+		int count = 0;
+		boolean keepLooking = true;
+		List<StockItem> testContents = new ArrayList<StockItem>(basketContents);
+		while (keepLooking) {
+			if (testContents.containsAll(dealComponents)) {
+				count++;
+				testContents.removeAll(dealComponents);
+			}
+			else {
+				keepLooking = false;
+			}
+		}
+		return count;
 	}
 }

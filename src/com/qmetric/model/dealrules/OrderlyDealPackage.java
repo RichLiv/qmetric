@@ -3,8 +3,13 @@
  */
 package com.qmetric.model.dealrules;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.qmetric.goods.ShoppingBasket;
 
@@ -22,13 +27,23 @@ public class OrderlyDealPackage implements DealPackage {
 	}
 	
 	/*
-	 * Returns deals applied in order in which they were implemented
-	 * Currently, this is not actually implemented but it could be used to implement whatever precanned algorithm we  want 
+	 * Returns deals that can be applied to this basket in the order of most advantageous (most saving to the consumer). SImplistic in that it doesn't try and combine 
+	 * deals to give the best result - just tests each deal in isolation. A real world solution would do the former
 	 */
 	public List<DealRules> getApplicableRules(ShoppingBasket b) {
-		List<DealRules> ret = new ArrayList<DealRules>();
-		ret.addAll(rulesForDeal); // TODO apply much more logic to this process 
-		return ret;
+		HashMap<DealRules, BigDecimal> valueOfDealsForThisBasket = new HashMap<DealRules, BigDecimal>();
+		for (DealRules nextDealToTest : this.rulesForDeal) {
+			int countMatches = b.numberOfMatches(nextDealToTest.getRelatedItems());
+			valueOfDealsForThisBasket.put(nextDealToTest, nextDealToTest.getTotalDealSaving(b.getCurrency()).multiply(BigDecimal.valueOf(countMatches)));
+		}
+		
+		Map<DealRules, BigDecimal> topTenDeals =
+			    valueOfDealsForThisBasket.entrySet().stream()
+			       .sorted(Map.Entry.comparingByKey(Comparator.reverseOrder()))
+			       .limit(10)
+			       .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		
+		return new ArrayList<DealRules>(topTenDeals.keySet());
 	}
 
 }
